@@ -1,4 +1,4 @@
-# import decouple 
+import decouple 
 
-# env = decouple.config
-# csv = decouple.Csv
+env = decouple.config
+csv = decouple.Csv
