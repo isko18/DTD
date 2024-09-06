@@ -1,19 +1,14 @@
-from .env_reader import env
+# from .env_reader import env
 from .settings import BASE_DIR
-SECRET_KEY =  env('SECRET_KEY')
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+from dotenv import load_dotenv
+import os
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': env("DB_NAME"),
-#         'USER': env("DB_USER"),
-#         'PASSWORD': env("DB_USER_PASSWORD"),
-#         'HOST': env('DB_HOST'),
-#         'PORT': env("DB_PORT"),
-#     }
-# }
+load_dotenv()
+
+SECRET_KEY =  os.environ.get('SECRET_KEY')
+DEBUG = True
+ALLOWED_HOSTS = ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
