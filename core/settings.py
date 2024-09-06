@@ -5,6 +5,8 @@ import os
 
 load_dotenv()
 
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -83,20 +85,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
-
-
 from core.cors import *
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# if not PRODUCTION:
-#     from .local import *
+if not PRODUCTION:
+    from .local import *
 # else:
 #     from .prod import *
 
