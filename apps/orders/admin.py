@@ -37,7 +37,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 # Регистрация модели Order
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id','order_id', 'from_city', 'to_city', 'product_category', 'delivery_cost', 'created_at')
+    list_display = ('id','order_id', 'user', 'from_city', 'to_city', 'product_category', 'delivery_cost', 'created_at')
     search_fields = ('from_city__name', 'to_city__name', 'product_category__name')
     list_filter = ('from_city', 'to_city', 'product_category', 'created_at')
     ordering = ('-created_at',)  # Сортировка по дате создания

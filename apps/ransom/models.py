@@ -1,13 +1,17 @@
 import string
 import random
 from django.db import models
-from apps.orders.models import City, SubCity, Label, ProductCategory
+from apps.orders.models import City, Label, ProductCategory
+from apps.users.models import User  # Импорт модели User
 
 def generate_unique_order_id():
     """Генерация уникального идентификатора для заказа."""
     return 'JOG' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
 class PurchaseOrder(models.Model):
+    # Поле для связи с пользователем, который сделал выкуп
+    user = models.ForeignKey(User, related_name="purchase_orders", on_delete=models.CASCADE, verbose_name="Пользователь")
+    
     # Поле для уникального идентификатора заказа
     order_id = models.CharField(max_length=10, unique=True, editable=False, verbose_name="ID заказа")
 

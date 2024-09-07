@@ -25,7 +25,7 @@ schema_view = get_schema_view(
 apps_includes = [
     path('orders/', include('apps.orders.urls')), 
     path('ransom/', include('apps.ransom.urls')), 
-    path('my_orders/', include('apps.my_orders.urls')),  
+    path('users/', include('apps.users.urls')),
     # path('categories/', include('apps.categories.urls')),  
     # path('carts/', include('apps.carts.urls')),  
     # path('billing/', include('apps.billing.urls')),  

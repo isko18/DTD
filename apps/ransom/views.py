@@ -1,6 +1,7 @@
 from rest_framework import viewsets, mixins
 from .models import PurchaseOrder
 from .serializers import PurchaseOrderSerializer
+from rest_framework.permissions import IsAuthenticated
 
 # ViewSet для выкупов заказов
 class PurchaseOrderViewSet(
@@ -13,5 +14,4 @@ class PurchaseOrderViewSet(
 ):
     queryset = PurchaseOrder.objects.all()
     serializer_class = PurchaseOrderSerializer
-
-    # Можно добавить дополнительные методы, если необходимо, например, для фильтрации или валидации
+    # permission_classes = [IsAuthenticated]  # Только аутентифицированные пользователи могут работать с выкупами

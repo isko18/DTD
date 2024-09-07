@@ -11,6 +11,7 @@ SECRET_KEY = env('SECRET_KEY')  # Забираем секретный ключ �
 
 # Приложения
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,7 +33,6 @@ INSTALLED_APPS = [
     'apps.orders',
     'apps.notification',
     'apps.base',
-    'apps.my_orders',
 
     # docs
     'drf_yasg',
@@ -120,6 +120,8 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+AUTH_USER_MODEL = "users.User"
 
 # JWT настройки
 SIMPLE_JWT = {

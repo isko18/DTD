@@ -1,6 +1,7 @@
 import random
 import string
 from django.db import models
+from apps.users.models import User
 
 # Модель города
 class City(models.Model):
@@ -33,6 +34,9 @@ class ProductCategory(models.Model):
 
 # Модель заказа
 class Order(models.Model):
+    # Пользователь, который сделал заказ
+    user = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE, verbose_name="Пользователь")
+
     # Уникальный ID заказа
     order_id = models.CharField(max_length=10, unique=True, blank=True, verbose_name="ID заказа")
 
@@ -57,7 +61,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
-        return f"Заказ {self.order_id} из {self.from_city.name} в {self.to_city.name}"
+        return f"Заказ {self.order_id} от {self.user.username} из {self.from_city.name} в {self.to_city.name}"
 
     def save(self, *args, **kwargs):
         if not self.order_id:
@@ -65,6 +69,9 @@ class Order(models.Model):
         super(Order, self).save(*args, **kwargs)
 
     def generate_unique_order_id(self):
+        """
+        Генерация уникального ID для заказа
+        """
         while True:
             order_id = 'JOG' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
             if not Order.objects.filter(order_id=order_id).exists():
