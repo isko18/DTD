@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'apps.orders',
     'apps.notification',
     'apps.base',
+    'apps.my_orders',
 
     # docs
     'drf_yasg',
