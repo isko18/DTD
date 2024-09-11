@@ -11,6 +11,7 @@ router.register(r'subcities', SubCityViewSet)
 router.register(r'labels', LabelViewSet)
 router.register(r'categories', ProductCategoryViewSet)
 router.register(r'orders', OrderViewSet)
+router.register(r'', OrderViewSet)
 
 # Подключаем сгенерированные маршруты
 urlpatterns = [

@@ -23,9 +23,9 @@ schema_view = get_schema_view(
 
 # Пути для включения различных приложений
 apps_includes = [
-    path('orders/', include('apps.orders.urls')), 
-    path('ransom/', include('apps.ransom.urls')), 
-    path('users/', include('apps.users.urls')),
+    path('', include('apps.orders.urls')), 
+    path('', include('apps.ransom.urls')), 
+    path('', include('apps.users.urls')),
     # path('categories/', include('apps.categories.urls')),  
     # path('carts/', include('apps.carts.urls')),  
     # path('billing/', include('apps.billing.urls')),  

@@ -71,4 +71,3 @@ class OrderViewSet(
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     # permission_classes = [IsAuthenticated]  # Только аутентифицированные пользователи могут работать с выкупами
-
