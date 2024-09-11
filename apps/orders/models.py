@@ -48,7 +48,7 @@ class Order(models.Model):
     order_id = models.CharField(max_length=10, unique=True, blank=True, verbose_name="ID заказа")
 
     # Добавляем поле статуса
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing', verbose_name="Статус заказа")
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='processing', verbose_name="Статус заказа")
 
     # Откуда
     from_city = models.ForeignKey(City, related_name="orders_from_city", on_delete=models.CASCADE, verbose_name="Город откуда")

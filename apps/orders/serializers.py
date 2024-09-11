@@ -27,7 +27,6 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         model = ProductCategory
         fields = ['id', 'name']
 
-# Сериализатор для заказа
 class OrderSerializer(serializers.ModelSerializer):
     from_city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
     from_subcity = serializers.PrimaryKeyRelatedField(queryset=SubCity.objects.all())
@@ -37,7 +36,7 @@ class OrderSerializer(serializers.ModelSerializer):
     product_category = serializers.PrimaryKeyRelatedField(queryset=ProductCategory.objects.all())
 
     order_id = serializers.CharField(read_only=True)
-    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, default='processing')
+    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
 
     class Meta:
         model = Order
@@ -46,12 +45,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'to_city', 'to_subcity', 'to_address', 'to_delivery_type', 'product_category', 'delivery_cost', 'comment', 'status', 'created_at'
         ]
 
-    def create(self, validated_data):
-        return Order.objects.create(**validated_data)
-
     def update(self, instance, validated_data):
+        # Позволяем изменять статус без ограничений
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         return instance
-
