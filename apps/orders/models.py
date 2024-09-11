@@ -2,7 +2,6 @@ import random
 import string
 from django.db import models
 from apps.users.models import User
-
 # Модель города
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name="Город")
@@ -34,11 +33,22 @@ class ProductCategory(models.Model):
 
 # Модель заказа
 class Order(models.Model):
+    STATUS_CHOICES = [
+        ('processing', 'Обработка заказа'),
+        ('document_preparation', 'Оформление груза в Дубае'),
+        ('courier_on_way', 'Курьер в пути'),
+        ('dispatched', 'Отгрузка заказа'),
+        ('received', 'Заказ получен'),
+        ('canceled', 'Отменен'),
+    ]
     # Пользователь, который сделал заказ
     user = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE, verbose_name="Пользователь")
 
     # Уникальный ID заказа
     order_id = models.CharField(max_length=10, unique=True, blank=True, verbose_name="ID заказа")
+
+    # Добавляем поле статуса
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing', verbose_name="Статус заказа")
 
     # Откуда
     from_city = models.ForeignKey(City, related_name="orders_from_city", on_delete=models.CASCADE, verbose_name="Город откуда")

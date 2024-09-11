@@ -37,12 +37,13 @@ class OrderSerializer(serializers.ModelSerializer):
     product_category = serializers.PrimaryKeyRelatedField(queryset=ProductCategory.objects.all())
 
     order_id = serializers.CharField(read_only=True)
+    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, default='processing')
 
     class Meta:
         model = Order
         fields = [
             'id', 'order_id', 'from_city', 'from_subcity', 'from_address', 'from_label', 'from_delivery_type',
-            'to_city', 'to_subcity', 'to_address', 'to_delivery_type', 'product_category', 'delivery_cost', 'comment', 'created_at'
+            'to_city', 'to_subcity', 'to_address', 'to_delivery_type', 'product_category', 'delivery_cost', 'comment', 'status', 'created_at'
         ]
 
     def create(self, validated_data):
@@ -53,3 +54,4 @@ class OrderSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+

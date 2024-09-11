@@ -34,11 +34,11 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('name',)
 
-# Регистрация модели Order
+# Регистрация модели Order в админке
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id','order_id', 'user', 'from_city', 'to_city', 'product_category', 'delivery_cost', 'created_at')
+    list_display = ('id', 'order_id', 'user', 'from_city', 'to_city', 'product_category', 'delivery_cost', 'status', 'created_at')
     search_fields = ('from_city__name', 'to_city__name', 'product_category__name')
-    list_filter = ('from_city', 'to_city', 'product_category', 'created_at')
+    list_filter = ('from_city', 'to_city', 'product_category', 'status', 'created_at')
     ordering = ('-created_at',)  # Сортировка по дате создания
     readonly_fields = ('created_at',)  # Поле только для чтения
