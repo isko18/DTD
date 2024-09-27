@@ -12,10 +12,18 @@ from dicttoxml import dicttoxml
 def send_nikita_sms(user, phone_number=None):
     if not settings.NIKITA_URL:
         return False
+    
+    # Генерация уникального идентификатора для сообщения
     id_string = '%s%d' % (user.id, datetime.now().timestamp())
+    
+    # Если номер телефона не передан, используем номер пользователя
     if not phone_number:
         phone_number = user.phone_number
+    
+    # Генерация и сохранение кода подтверждения
     user.generate_and_save_verification_code()
+    
+    # Формируем сообщение
     message = f"Ваш код верификации: {user.verification_code}"
     data = {
         'login': settings.NIKITA_LOGIN,
@@ -25,17 +33,35 @@ def send_nikita_sms(user, phone_number=None):
         'text': message,
         'phones': [phone_number],
     }
-    if settings.NIKITA_TEST:
+    
+    # Добавляем тестовый флаг, если требуется
+    if str(settings.NIKITA_TEST) == "1":
         data['test'] = "1"
+    # Преобразование данных в XML
     xml_page = dicttoxml(data, custom_root='message',
-                     item_func=lambda x: x[:-1], attr_type=False)
+                         item_func=lambda x: x[:-1], attr_type=False)
+    
+    # Логирование отправляемого XML-запроса
+    print(f"Sending SMS request: {xml_page}")
+    
+    # Отправка запроса
     response = requests.post(
         settings.NIKITA_URL,
         data=xml_page, headers={'Content-Type': 'application/xml'}
     )
+    
+    # Логирование ответа
+    print(f"Response status: {response.status_code}, Response body: {response.text}")
+    
+    # Преобразование ответа из XML в словарь
     response_dict = xmltodict.parse(response.text)
     status = response_dict['response']['status']
+    
+    # Проверка статуса ответа
     if status not in ('0', '11'):
-        # TODO: add error handle
+        print(f"SMS sending failed. Status: {status}")
         return False
+    
+    # Сообщение успешно отправлено
     return True
+

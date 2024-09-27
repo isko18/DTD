@@ -9,6 +9,7 @@ from djoser.serializers import (
 )
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+
 from rest_framework.exceptions import ValidationError, PermissionDenied
 
 from apps.users.constants import (
@@ -30,13 +31,20 @@ class UserCreateSerializer(PhoneNumberValidateMixin, UserCreatePasswordRetypeSer
     def create(self, validated_data):
         try:
             with transaction.atomic():
+                print("Creating user...")
                 user = User.objects.create_user(**validated_data)
+                print(f"User created: {user}")
+
                 if not user.check_otp_limit():
+                    print("OTP limit exceeded")
                     raise ValidationError(OTP_LIMIT_ERROR_MESSAGE)
                 is_code_sent = send_nikita_sms(user)
                 if not is_code_sent:
+                    print("SMS not sent")
                     raise ValidationError(OTP_ERROR_MESSAGE)
-        except IntegrityError:
+                print("User successfully registered and SMS sent.")
+        except IntegrityError as e:
+            print(f"IntegrityError: {str(e)}")
             raise PermissionDenied(detail="User is already registered")
         return user
 

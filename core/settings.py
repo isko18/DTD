@@ -175,6 +175,11 @@ FCM_DJANGO_SETTINGS = {
     # default: False
     "DELETE_INACTIVE_DEVICES": False,
 }
+NIKITA_LOGIN = env('NIKITA_LOGIN', default='')
+NIKITA_PASSWORD = env('NIKITA_PASSWORD', default='')
+NIKITA_SENDER = env('NIKITA_SENDER', default='')
+NIKITA_TEST = env('NIKITA_TEST', default='0')
+NIKITA_URL = env('NIKITA_URL', default='')
 
 REDIS_HOST = env('REDIS_HOST', default='0.0.0.0')
 REDIS_PORT = env('REDIS_PORT', default='6379')
