@@ -96,14 +96,20 @@ class CustomTokenCreateSerializer(TokenCreateSerializer):
 
     def validate(self, attrs):
         password = attrs.get("password")
-        params = {settings.LOGIN_FIELD: attrs.get(settings.LOGIN_FIELD)}
+        phone_number = attrs.get("phone_number")  # Убедитесь, что phone_number передается
+        
+        # Аутентификация по номеру телефона и паролю
         self.user = authenticate(
-            request=self.context.get("request"), **params, password=password
+            request=self.context.get("request"), phone_number=phone_number, password=password
         )
+        
+        # Если пользователь не аутентифицирован, ищем пользователя напрямую
         if not self.user:
-            self.user = User.objects.filter(**params).first()
+            self.user = User.objects.filter(phone_number=phone_number).first()
             if self.user and not self.user.check_password(password):
                 self.fail("invalid_credentials")
+
+        # Проверка на активность пользователя
         if self.user:
             if self.user.is_active:
                 return attrs
@@ -117,6 +123,7 @@ class CustomTokenCreateSerializer(TokenCreateSerializer):
                     raise ValidationError(OTP_ERROR_MESSAGE)
 
         self.fail("invalid_credentials")
+
 
 
 class UserSignInSerializer(TokenSerializer):

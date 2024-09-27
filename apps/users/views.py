@@ -28,22 +28,31 @@ class CustomTokenCreateView(TokenCreateView):
     serializer_class = CustomTokenCreateSerializer
 
     def _action(self, serializer):
+        # Получаем пользователя по номеру телефона
         user = User.objects.filter(phone_number=serializer.data.get('phone_number')).first()
-        if user.is_active:
-            token = utils.login_user(self.request, serializer.user)
-            token_serializer_class = settings.SERIALIZERS.token
-            data = token_serializer_class(token).data
-            user = User.objects.get(pk=data.get('pk'))
-            if serializer.data.get('fcm_token'):
-                user.fcm_token = serializer.data.get('fcm_token')
-                user.save()
-            return Response(
-                data=data, status=status.HTTP_200_OK
-            )
-        else:
-            data = {'is_active': False}
-            return Response(data=data, status=status.HTTP_206_PARTIAL_CONTENT)
 
+        # Проверка, что пользователь существует
+        if not user:
+            return Response({"detail": "Пользователь не найден."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Проверка активности пользователя
+        if not user.is_active:
+            return Response({"detail": "Пользователь не активен."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Создание токена для пользователя
+        token = utils.login_user(self.request, user)
+        token_serializer_class = settings.SERIALIZERS.token
+
+        # Получаем данные токена
+        data = token_serializer_class(token).data
+
+        # Обновляем FCM токен, если он передан
+        if serializer.data.get('fcm_token'):
+            user.fcm_token = serializer.data.get('fcm_token')
+            user.save()
+
+        # Возвращаем данные токена
+        return Response(data=data, status=status.HTTP_200_OK)
 
 class BaseUserPostView(GenericAPIView):
     serializer_class = None

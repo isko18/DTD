@@ -22,9 +22,11 @@ INSTALLED_APPS = [
     # admin
     # 'apps.custom_admin',
     'fcm_django',
+    
     # rest
     'rest_framework',
     'corsheaders',
+    'rest_framework.authtoken',
     'django_filters',
 
     # apps
