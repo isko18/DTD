@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from notification.models import Notification
+from apps.notification.models import Notification
 
 
 @shared_task
