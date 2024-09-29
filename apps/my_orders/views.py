@@ -1,4 +1,5 @@
 from rest_framework import viewsets, response
+from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from apps.orders.models import Order
@@ -6,30 +7,31 @@ from apps.ransom.models import PurchaseOrder
 from .serializers import CombinedOrderSerializer
 
 
-
 class CombinedOrderViewSet(viewsets.ViewSet):
-    """
-    ViewSet для работы с объединёнными заказами (Order и PurchaseOrder).
-    """
-    
+    permission_classes = [IsAuthenticated]  # Только для аутентифицированных пользователей
+
     def list(self, request):
-        """
-        Возвращает список всех заказов (обычные и выкупные).
-        """
-        orders = Order.objects.all()
-        purchase_orders = PurchaseOrder.objects.all()
+        user = request.user
+
+        # Фильтруем заказы и выкупы только для текущего пользователя
+        orders = Order.objects.filter(user=user)
+        purchase_orders = PurchaseOrder.objects.filter(user=user)
+
+        # Логирование для отладки
+        print(f"Orders: {orders}")
+        print(f"Purchase Orders: {purchase_orders}")
+
+        # Объединяем запросы
         combined_queryset = list(orders) + list(purchase_orders)
+
+        # Логирование после объединения
+        print(f"Combined Queryset: {combined_queryset}")
+
+        # Сериализуем данные
         serializer = CombinedOrderSerializer(combined_queryset, many=True)
+        
+        # Логирование сериализованных данных
+        print(f"Serialized Data: {serializer.data}")
+
         return response.Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
-        """
-        Возвращает детальные данные о заказе по его order_id.
-        """
-        try:
-            order = Order.objects.get(order_id=pk)
-        except Order.DoesNotExist:
-            order = get_object_or_404(PurchaseOrder, order_id=pk)
-        
-        serializer = CombinedOrderSerializer(order)
-        return response.Response(serializer.data)

@@ -4,7 +4,7 @@ from djoser.views import TokenCreateView, TokenDestroyView
 from fcm_django.api.rest_framework import FCMDeviceViewSet
 
 from apps.users import views
-# from notification.views import NotificationListView, NotificationClearView
+from apps.notification.views import NotificationListView, NotificationClearView
 from apps.users.views import CustomTokenCreateView, ChangePasswordView
 
 urlpatterns = [
@@ -17,8 +17,8 @@ urlpatterns = [
     path('verification_code_sent/', views.UserVerificationCodeSentView.as_view(), name='verification_code_sent'),
     path('verification_code_check/', views.UserVerificationCodeCheckView.as_view(), name='verification_code_check'),
     path('profile/', views.UserUpdateView.as_view(), name='user_detail'),
-    # path('notifications/', NotificationListView.as_view(), name='notification_list'),
-    # path('notifications/clear/', NotificationClearView.as_view(), name='notification_clear'),
+    path('notifications/', NotificationListView.as_view(), name='notification_list'),
+    path('notifications/clear/', NotificationClearView.as_view(), name='notification_clear'),
 
     path('change_phone_number/', views.UserChangePhoneNumberView.as_view(), name='change_phone_number'),
     path('set_new_phone_number/', views.UserSetNewPhoneNumberView.as_view(), name='set_new_phone_number'),

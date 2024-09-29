@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.ransom',
     'apps.orders',
-    # 'apps.notification',
+    'apps.notification',
     'apps.base',
     'apps.my_orders',
 

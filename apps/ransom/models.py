@@ -2,6 +2,7 @@ import string
 import random
 from django.db import models
 from apps.orders.models import City, SubCity, ProductCategory
+from django.conf import settings 
 
 def generate_unique_order_id():
     """Генерация уникального идентификатора для заказа."""
@@ -41,6 +42,7 @@ class PurchaseOrder(models.Model):
     pickup_service = models.BooleanField(default=False, verbose_name="Услуга вылова товара")
     keep_shoe_box = models.BooleanField(default=False, verbose_name="Сохранить коробку из под обуви")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="rensom_user", verbose_name="Пользователь")
 
     def __str__(self):
         return f"Выкуп {self.product_name} для {self.receiver_name} ({self.from_city} -> {self.to_city})"

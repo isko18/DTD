@@ -24,12 +24,17 @@ class CombinedOrderSerializer(serializers.Serializer):
     delivery_cost = serializers.SerializerMethodField()
     comment = serializers.CharField()
     created_at = serializers.DateTimeField()
+    user = serializers.SerializerMethodField()  # Поле для отображения пользователя
 
     def get_order_type(self, obj):
         if isinstance(obj, Order):
+            print(f"Regular order: {obj.order_id}")
             return "regular_order"
         elif isinstance(obj, PurchaseOrder):
+            print(f"Purchase order: {obj.order_id}")
             return "purchase_order"
+        print(f"Unknown order type: {type(obj)}")
+        return "unknown"
 
     def get_product_name(self, obj):
         if isinstance(obj, PurchaseOrder):
@@ -79,6 +84,16 @@ class CombinedOrderSerializer(serializers.Serializer):
     def get_delivery_cost(self, obj):
         if isinstance(obj, Order):
             return obj.delivery_cost
+        return None
+
+    # Метод для отображения пользователя
+    def get_user(self, obj):
+        if obj.user:
+            return {
+                'id': obj.user.id,
+                'name': obj.user.name,  # Предположим, у пользователя есть поле 'name'
+                'phone_number': obj.user.phone_number  # Или другой идентификатор
+            }
         return None
 
     def to_representation(self, instance):

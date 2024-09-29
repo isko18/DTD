@@ -1,6 +1,7 @@
 import random
 import string
 from django.db import models
+from django.conf import settings 
 
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name="Город")
@@ -56,6 +57,7 @@ class Order(models.Model):
     delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость доставки")
     comment = models.TextField(blank=True, verbose_name="Комментарий")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders_users", verbose_name="Пользователь")
 
     def __str__(self):
         return f"Заказ {self.order_id} из {self.from_city.name} в {self.to_city.name}"
