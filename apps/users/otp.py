@@ -1,13 +1,8 @@
 import requests
-
 import xmltodict
-
 from datetime import datetime
-
 from django.conf import settings
-
 from dicttoxml import dicttoxml
-
 
 def send_nikita_sms(user, phone_number=None):
     if not settings.NIKITA_URL:
@@ -20,8 +15,14 @@ def send_nikita_sms(user, phone_number=None):
     if not phone_number:
         phone_number = user.phone_number
     
-    # Генерация и сохранение кода подтверждения
-    user.generate_and_save_verification_code()
+    # Проверка, если номер телефона является тестовым
+    if phone_number == "+996111111":
+        # Включение тестового режима и установка кода 123456
+        settings.NIKITA_TEST = "1"
+        user.verification_code = "123456"
+    else:
+        # Генерация и сохранение кода подтверждения, если не тестовый режим
+        user.generate_and_save_verification_code()
     
     # Формируем сообщение
     message = f"Ваш код верификации: {user.verification_code}"
@@ -37,6 +38,7 @@ def send_nikita_sms(user, phone_number=None):
     # Добавляем тестовый флаг, если требуется
     if str(settings.NIKITA_TEST) == "1":
         data['test'] = "1"
+    
     # Преобразование данных в XML
     xml_page = dicttoxml(data, custom_root='message',
                          item_func=lambda x: x[:-1], attr_type=False)
@@ -64,4 +66,3 @@ def send_nikita_sms(user, phone_number=None):
     
     # Сообщение успешно отправлено
     return True
-

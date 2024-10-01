@@ -8,6 +8,11 @@ from apps.utils import validate_kyrgyz_phone_number
 class PhoneNumberValidateMixin:
 
     def validate_new_phone_number(self, value):
+        # Исключение для тестового номера
+        if value == "+996111111":
+            return value
+
+        # Нормализация и валидация номера
         value = normalize_phone_number(value)
         if not validate_kyrgyz_phone_number(value):
             raise serializers.ValidationError(
@@ -16,6 +21,11 @@ class PhoneNumberValidateMixin:
         return value
 
     def validate_phone_number(self, value):
+        # Исключение для тестового номера
+        if value == "+996111111":
+            return value
+
+        # Нормализация и валидация номера
         value = normalize_phone_number(value)
         if not validate_kyrgyz_phone_number(value):
             raise serializers.ValidationError(
