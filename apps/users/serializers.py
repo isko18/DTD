@@ -23,28 +23,23 @@ from django.contrib.auth.password_validation import validate_password
 User = get_user_model()
 
 
-class UserCreateSerializer(PhoneNumberValidateMixin, UserCreatePasswordRetypeSerializer):
+class UserCreateSerializer(PhoneNumberValidateMixin, serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("pk", "phone_number", "name", "password", 'fcm_token')
+        fields = ("pk", "phone_number", "name", 'fcm_token')  # Пароль удален
 
     def create(self, validated_data):
         try:
             with transaction.atomic():
-                print("Creating user...")
                 user = User.objects.create_user(**validated_data)
-                print(f"User created: {user}")
-
                 if not user.check_otp_limit():
-                    print("OTP limit exceeded")
                     raise ValidationError(OTP_LIMIT_ERROR_MESSAGE)
-                is_code_sent = send_nikita_sms(user)
+
+                is_code_sent = send_nikita_sms(user)  # Отправляем SMS с кодом
                 if not is_code_sent:
-                    print("SMS not sent")
                     raise ValidationError(OTP_ERROR_MESSAGE)
                 print("User successfully registered and SMS sent.")
         except IntegrityError as e:
-            print(f"IntegrityError: {str(e)}")
             raise PermissionDenied(detail="User is already registered")
         return user
 
@@ -90,39 +85,27 @@ class UserActivationSerializer(PhoneNumberValidateMixin, BaseVerificationCodeSer
         })
         return data
 
-
-class CustomTokenCreateSerializer(TokenCreateSerializer):
-    fcm_token = serializers.CharField(required=False, max_length=255)
+class CustomTokenCreateSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(required=True, max_length=30)
 
     def validate(self, attrs):
-        password = attrs.get("password")
-        phone_number = attrs.get("phone_number")  # Убедитесь, что phone_number передается
-        
-        # Аутентификация по номеру телефона и паролю
-        self.user = authenticate(
-            request=self.context.get("request"), phone_number=phone_number, password=password
-        )
-        
-        # Если пользователь не аутентифицирован, ищем пользователя напрямую
+        phone_number = attrs.get("phone_number")
+        self.user = User.objects.filter(phone_number=phone_number).first()
+
         if not self.user:
-            self.user = User.objects.filter(phone_number=phone_number).first()
-            if self.user and not self.user.check_password(password):
-                self.fail("invalid_credentials")
+            raise ValidationError(USER_NOT_EXISTS_ERROR)
 
-        # Проверка на активность пользователя
-        if self.user:
-            if self.user.is_active:
-                return attrs
-            else:
-                if not self.user.check_otp_limit():
-                    raise ValidationError(OTP_LIMIT_ERROR_MESSAGE)
-                is_code_sent = send_nikita_sms(self.user)
-                if is_code_sent:
-                    return attrs
-                if not is_code_sent:
-                    raise ValidationError(OTP_ERROR_MESSAGE)
+        if not self.user.check_otp_limit():
+            raise ValidationError(OTP_LIMIT_ERROR_MESSAGE)
 
-        self.fail("invalid_credentials")
+        is_code_sent = send_nikita_sms(self.user)  # Отправляем SMS с кодом
+        if not is_code_sent:
+            raise ValidationError(OTP_ERROR_MESSAGE)
+
+        return attrs
+
+    def to_representation(self, instance):
+        return {"message": _("Код верификации отправлен на указанный номер")}
 
 
 
@@ -151,12 +134,11 @@ class UserVerificationCodeSentSerializer(PhoneNumberValidateMixin, serializers.S
         return attrs
 
     def update(self, instance, validated_data):
-        with transaction.atomic():
-            if not instance.check_otp_limit():
-                raise ValidationError(OTP_LIMIT_ERROR_MESSAGE)
-            is_code_sent = send_nikita_sms(instance)
-            if not is_code_sent:
-                raise ValidationError(OTP_ERROR_MESSAGE)
+        if not instance.check_otp_limit():
+            raise ValidationError(OTP_LIMIT_ERROR_MESSAGE)
+        is_code_sent = send_nikita_sms(instance)
+        if not is_code_sent:
+            raise ValidationError(OTP_ERROR_MESSAGE)
         return instance
 
     def to_representation(self, instance):
@@ -172,14 +154,12 @@ class UserVerificationCodeCheckSerializer(PhoneNumberValidateMixin, BaseVerifica
 
     def update(self, instance, validated_data):
         instance.verification_code = None
-        instance.save(update_fields=['verification_code', ])
+        instance.save(update_fields=['verification_code', ])  # Очищаем код
         return instance
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data.update({"message": _("Номер успешно подтверждён")})
-        return data
-
+        token, _ = Token.objects.get_or_create(user=instance)
+        return {"auth_token": token.key, "message": _("Номер успешно подтвержден")}
 
 class UserPasswordResetSerializer(PhoneNumberValidateMixin, PasswordRetypeSerializer):
     phone_number = serializers.CharField(required=True, max_length=30)

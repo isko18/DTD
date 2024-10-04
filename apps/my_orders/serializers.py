@@ -3,6 +3,7 @@ from apps.orders.models import Order
 from apps.ransom.models import PurchaseOrder
 
 class CombinedOrderSerializer(serializers.Serializer):
+    # id = serializers.SerializerMethodField()
     order_type = serializers.SerializerMethodField()
     order_id = serializers.CharField()
     status = serializers.CharField()

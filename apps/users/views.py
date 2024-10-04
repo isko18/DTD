@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
+from apps.users.otp import send_nikita_sms
 
 from apps.users.serializers import (
     UserCreateSerializer, UserVerificationCodeCheckSerializer,
@@ -23,37 +24,30 @@ from apps.users.serializers import (
 
 User = get_user_model()
 
-
 class CustomTokenCreateView(TokenCreateView):
     serializer_class = CustomTokenCreateSerializer
 
     def _action(self, serializer):
         # Получаем пользователя по номеру телефона
-        user = User.objects.filter(phone_number=serializer.data.get('phone_number')).first()
+        phone_number = serializer.validated_data.get('phone_number')
+        user = User.objects.filter(phone_number=phone_number).first()
 
         # Проверка, что пользователь существует
         if not user:
-            return Response({"detail": "Пользователь не найден."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Пользователь с таким номером не зарегистрирован."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Проверка активности пользователя
+        # Проверка, что пользователь активен
         if not user.is_active:
-            return Response({"detail": "Пользователь не активен."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Пользователь не активирован."}, status=status.HTTP_403_FORBIDDEN)
 
-        # Создание токена для пользователя
-        token = utils.login_user(self.request, user)
-        token_serializer_class = settings.SERIALIZERS.token
+        # Отправляем код верификации для входа только для активных пользователей
+        is_code_sent = send_nikita_sms(user)
+        if not is_code_sent:  # Если код не отправлен
+            return Response({"detail": "Ошибка отправки SMS."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Получаем данные токена
-        data = token_serializer_class(token).data
-
-        # Обновляем FCM токен, если он передан
-        if serializer.data.get('fcm_token'):
-            user.fcm_token = serializer.data.get('fcm_token')
-            user.save()
-
-        # Возвращаем данные токена
-        return Response(data=data, status=status.HTTP_200_OK)
-
+        # Если код отправлен, возвращаем сообщение об успешной отправке
+        return Response({"detail": "Код отправлен на указанный номер телефона."}, status=status.HTTP_200_OK)
+    
 class BaseUserPostView(GenericAPIView):
     serializer_class = None
 
@@ -74,11 +68,10 @@ class UserCreateView(CreateAPIView):
     permission_classes = (AllowAny,)
 
     def create(self, request: Request, *args, **kwargs) -> Response:
-        """Only for flutter mobile"""
-        user_is_exists = User.objects.filter(phone_number=request.data.get(
-            'phone_number')).exists()
-        if user_is_exists:
-            raise PermissionDenied(detail="User already exists")
+        """Регистрация только по номеру телефона"""
+        user_exists = User.objects.filter(phone_number=request.data.get('phone_number')).exists()
+        if user_exists:
+            raise PermissionDenied(detail="Пользователь с таким номером уже зарегистрирован.")
         return super().create(request, *args, **kwargs)
 
 
@@ -87,6 +80,9 @@ class UserActivationView(BaseUserPostView):
     serializer_class = UserActivationSerializer
     permission_classes = (AllowAny,)
 
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        """Активация учетной записи после ввода кода"""
+        return super().post(request, *args, **kwargs)
 
 class UserVerificationCodeSentView(BaseUserPostView):
     http_method_names = ('post',)
@@ -98,6 +94,11 @@ class UserVerificationCodeCheckView(BaseUserPostView):
     http_method_names = ('post',)
     serializer_class = UserVerificationCodeCheckSerializer
     permission_classes = (AllowAny,)
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        """Проверка введенного кода и выдача токена"""
+        return super().post(request, *args, **kwargs)
+
 
 
 class UserPasswordResetView(BaseUserPostView):
@@ -150,6 +151,7 @@ class UserChangePhoneNumberView(BaseUserPostView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return serializer.data
+
 
 
 class UserSetNewPhoneNumberView(BaseUserPostView):

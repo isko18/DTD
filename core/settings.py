@@ -177,6 +177,7 @@ FCM_DJANGO_SETTINGS = {
     # default: False
     "DELETE_INACTIVE_DEVICES": False,
 }
+
 NIKITA_LOGIN = env('NIKITA_LOGIN', default='')
 NIKITA_PASSWORD = env('NIKITA_PASSWORD', default='')
 NIKITA_SENDER = env('NIKITA_SENDER', default='')
