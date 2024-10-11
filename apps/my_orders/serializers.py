@@ -6,6 +6,7 @@ class CombinedOrderSerializer(serializers.Serializer):
     # id = serializers.SerializerMethodField()
     order_type = serializers.SerializerMethodField()
     order_id = serializers.CharField()
+    estimated_arrival = serializers.CharField()
     status = serializers.CharField()
     from_city = serializers.CharField(source='from_city.name')
     from_subcity = serializers.CharField(source='from_subcity.name')
@@ -82,6 +83,11 @@ class CombinedOrderSerializer(serializers.Serializer):
             return obj.quantity
         return None
 
+    def get_estimated_arrival(self, obj):
+        if isinstance(obj, PurchaseOrder):
+            return obj.estimated_arrival
+        return None
+    
     def get_delivery_cost(self, obj):
         if isinstance(obj, Order):
             return obj.delivery_cost

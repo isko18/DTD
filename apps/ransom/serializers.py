@@ -29,7 +29,7 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseOrder
         fields = [
-            'id','user', 'order_id', 'from_city', 'from_subcity', 'from_address', 'from_delivery_type',
+            'id', 'order_id', 'from_city', 'from_subcity', 'from_address', 'from_delivery_type',
             'to_city', 'to_subcity', 'to_address', 'to_delivery_type',
             'sender_name', 'sender_phone',
             'receiver_name', 'receiver_phone',

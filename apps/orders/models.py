@@ -41,6 +41,8 @@ class Order(models.Model):
         ('courier_on_way', 'Курьер в пути'),
         ('order_shipped', 'Отгрузка заказа'),
         ('order_received', 'Заказ получен'),
+        ('order_completed', 'Завершен'),
+        
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='order_processing', verbose_name="Статус")
     estimated_arrival = models.DateTimeField(null=True, blank=True, verbose_name="Примерное время прибытия")
@@ -55,7 +57,7 @@ class Order(models.Model):
     to_delivery_type = models.CharField(max_length=50, choices=[('door', 'От двери'), ('pickup', 'Самовывоз')], verbose_name="Тип доставки куда")
     product_category = models.ForeignKey(ProductCategory, related_name="orders", on_delete=models.SET_NULL, null=True, verbose_name="Категория товара")
     delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость доставки")
-    comment = models.TextField(blank=True, verbose_name="Комментарий")
+    comment = models.TextField(blank=True, null=True, verbose_name="Комментарий")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders_users", verbose_name="Пользователь")
 

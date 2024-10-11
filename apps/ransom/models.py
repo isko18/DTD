@@ -38,7 +38,7 @@ class PurchaseOrder(models.Model):
     color = models.CharField(max_length=50, verbose_name="Цвет товара")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
     quantity = models.PositiveIntegerField(verbose_name="Количество")
-    comment = models.TextField(blank=True, verbose_name="Комментарий")
+    comment = models.TextField(blank=True, null=True, verbose_name="Комментарий")
     pickup_service = models.BooleanField(default=False, verbose_name="Услуга вылова товара")
     keep_shoe_box = models.BooleanField(default=False, verbose_name="Сохранить коробку из под обуви")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
