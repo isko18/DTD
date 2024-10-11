@@ -15,6 +15,8 @@ class PurchaseOrder(models.Model):
         ('courier_on_way', 'Курьер в пути'),
         ('order_shipped', 'Отгрузка заказа'),
         ('order_received', 'Заказ получен'),
+        ('order_completed', 'Завершен'),
+        
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='order_processing', verbose_name="Статус")
     estimated_arrival = models.DateTimeField(null=True, blank=True, verbose_name="Примерное время прибытия")
