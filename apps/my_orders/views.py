@@ -11,9 +11,9 @@ class CombinedOrderViewSet(viewsets.ViewSet):
     def list(self, request):
         user = request.user
 
-        # Фильтруем заказы и выкупы только для текущего пользователя
-        orders = Order.objects.filter(user=user)
-        purchase_orders = PurchaseOrder.objects.filter(user=user)
+        # Фильтруем заказы и выкупы для текущего пользователя, исключая завершенные
+        orders = Order.objects.filter(user=user).exclude(status='order_completed')
+        purchase_orders = PurchaseOrder.objects.filter(user=user).exclude(status='order_completed')
 
         # Объединяем запросы
         combined_queryset = list(orders) + list(purchase_orders)
