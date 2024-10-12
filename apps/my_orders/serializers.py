@@ -3,7 +3,6 @@ from apps.orders.models import Order
 from apps.ransom.models import PurchaseOrder
 
 class CombinedOrderSerializer(serializers.Serializer):
-    # id = serializers.SerializerMethodField()
     order_type = serializers.SerializerMethodField()
     order_id = serializers.CharField()
     estimated_arrival = serializers.CharField()
@@ -30,10 +29,10 @@ class CombinedOrderSerializer(serializers.Serializer):
     delivery_cost = serializers.SerializerMethodField()
     comment = serializers.CharField()
     created_at = serializers.DateTimeField()
-    keep_shoe_box = serializers.BooleanField()
-    pickup_service = serializers.BooleanField()
-    user = serializers.SerializerMethodField()  # Поле для отображения пользователя
-
+    keep_shoe_box = serializers.SerializerMethodField()
+    pickup_service = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
+    
     def get_order_type(self, obj):
         if isinstance(obj, Order):
             print(f"Regular order: {obj.order_id}")
@@ -99,15 +98,15 @@ class CombinedOrderSerializer(serializers.Serializer):
             return obj.estimated_arrival
         return None
     
-    def get_pickup_service(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.pickup_service
-        return None 
-    
     def get_keep_shoe_box(self, obj):
         if isinstance(obj, PurchaseOrder):
             return obj.keep_shoe_box
-        return None 
+        return None
+
+    def get_pickup_service(self, obj):
+        if isinstance(obj, PurchaseOrder):
+            return obj.pickup_service
+        return None
     
     def get_delivery_cost(self, obj):
         if isinstance(obj, Order):
