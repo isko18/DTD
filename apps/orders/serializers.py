@@ -29,6 +29,6 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             'id', 'order_id', 'from_city', 'from_subcity', 'from_address', 'from_delivery_type',
-            'to_city', 'to_subcity', 'to_address', 'to_delivery_type', 'product_category',
+            'to_city', 'to_subcity', 'to_address', 'to_delivery_type','receiver_name', 'receiver_phone', 'product_category',
             'delivery_cost', 'comment', 'created_at'
         ]

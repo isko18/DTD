@@ -55,6 +55,8 @@ class Order(models.Model):
     to_subcity = models.ForeignKey(SubCity, related_name="orders_to_subcity", on_delete=models.CASCADE, verbose_name="Подгород куда")
     to_address = models.CharField(max_length=255, verbose_name="Адрес куда")
     to_delivery_type = models.CharField(max_length=50, choices=[('door', 'От двери'), ('pickup', 'Самовывоз')], verbose_name="Тип доставки куда")
+    receiver_name = models.CharField(max_length=100, verbose_name="Имя получателя")
+    receiver_phone = models.CharField(max_length=20, verbose_name="Телефон получателя")
     product_category = models.ForeignKey(ProductCategory, related_name="orders", on_delete=models.SET_NULL, null=True, verbose_name="Категория товара")
     delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость доставки")
     comment = models.TextField(blank=True, null=True, verbose_name="Комментарий")

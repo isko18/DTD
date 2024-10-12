@@ -17,6 +17,7 @@ class CombinedOrderSerializer(serializers.Serializer):
     to_subcity = serializers.CharField(source='to_subcity.name')
     to_address = serializers.CharField()
     product_name = serializers.SerializerMethodField()
+    product_url = serializers.SerializerMethodField()
     product_category = serializers.CharField()
     price = serializers.SerializerMethodField()
     sender_name = serializers.SerializerMethodField()
@@ -29,6 +30,8 @@ class CombinedOrderSerializer(serializers.Serializer):
     delivery_cost = serializers.SerializerMethodField()
     comment = serializers.CharField()
     created_at = serializers.DateTimeField()
+    keep_shoe_box = serializers.BooleanField()
+    pickup_service = serializers.BooleanField()
     user = serializers.SerializerMethodField()  # Поле для отображения пользователя
 
     def get_order_type(self, obj):
@@ -45,7 +48,12 @@ class CombinedOrderSerializer(serializers.Serializer):
         if isinstance(obj, PurchaseOrder):
             return obj.product_name
         return None  # У обычного заказа нет поля product_name
-
+    
+    def get_product_url(self, obj):
+        if isinstance(obj, PurchaseOrder):
+            return obj.product_url
+        return None 
+    
     def get_price(self, obj):
         if isinstance(obj, PurchaseOrder):
             return obj.price
@@ -91,6 +99,16 @@ class CombinedOrderSerializer(serializers.Serializer):
             return obj.estimated_arrival
         return None
     
+    def get_pickup_service(self, obj):
+        if isinstance(obj, PurchaseOrder):
+            return obj.pickup_service
+        return None 
+    
+    def get_keep_shoe_box(self, obj):
+        if isinstance(obj, PurchaseOrder):
+            return obj.keep_shoe_box
+        return None 
+    
     def get_delivery_cost(self, obj):
         if isinstance(obj, Order):
             return obj.delivery_cost
@@ -109,6 +127,16 @@ class CombinedOrderSerializer(serializers.Serializer):
     def get_product_category(self, obj):
         if isinstance(obj, Order):
             return obj.product_category
+        return None
+    
+    def get_receiver_name(self, obj):
+        if isinstance(obj, Order):
+            return obj.receiver_name
+        return None
+
+    def get_receiver_phone(self, obj):
+        if isinstance(obj, Order):
+            return obj.receiver_phone
         return None
 
     # Метод для отображения пользователя
