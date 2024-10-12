@@ -17,6 +17,7 @@ class CombinedOrderSerializer(serializers.Serializer):
     to_subcity = serializers.CharField(source='to_subcity.name')
     to_address = serializers.CharField()
     product_name = serializers.SerializerMethodField()
+    product_category = serializers.CharField()
     price = serializers.SerializerMethodField()
     sender_name = serializers.SerializerMethodField()
     sender_phone = serializers.SerializerMethodField()
@@ -103,6 +104,11 @@ class CombinedOrderSerializer(serializers.Serializer):
     def get_to_delivery_type(self, obj):
         if isinstance(obj, Order):
             return obj.to_delivery_type
+        return None
+    
+    def get_product_category(self, obj):
+        if isinstance(obj, Order):
+            return obj.product_category
         return None
 
     # Метод для отображения пользователя
