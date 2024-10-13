@@ -27,7 +27,7 @@ apps_includes = [
     path('ransom/', include('apps.ransom.urls')), 
     path('my_orders/', include('apps.my_orders.urls')),  
     path('users/', include('apps.users.urls')),  
-    # path('carts/', include('apps.carts.urls')),  
+    path('base/', include('apps.base.urls')),  
     # path('billing/', include('apps.billing.urls')),  
 ]
 

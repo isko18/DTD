@@ -12,6 +12,7 @@ SECRET_KEY = env('SECRET_KEY')  # Забираем секретный ключ �
 # Приложения
 INSTALLED_APPS = [
     'jazzmin',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -22,6 +23,8 @@ INSTALLED_APPS = [
     # admin
     # 'apps.custom_admin',
     'fcm_django',
+    'adminsortable2',
+    'solo',
     
     # rest
     'rest_framework',
