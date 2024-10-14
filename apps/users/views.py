@@ -28,26 +28,14 @@ class CustomTokenCreateView(TokenCreateView):
     serializer_class = CustomTokenCreateSerializer
 
     def _action(self, serializer):
-        # Получаем пользователя по номеру телефона
-        phone_number = serializer.validated_data.get('phone_number')
-        user = User.objects.filter(phone_number=phone_number).first()
+        # Пользователь уже передан в attrs из сериализатора
+        user = serializer.validated_data['user']
 
-        # Проверка, что пользователь существует
-        if not user:
-            return Response({"detail": "Пользователь с таким номером не зарегистрирован."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Проверка, что пользователь активен
-        if not user.is_active:
-            return Response({"detail": "Пользователь не активирован."}, status=status.HTTP_403_FORBIDDEN)
-
-        # Отправляем код верификации для входа только для активных пользователей
-        is_code_sent = send_nikita_sms(user)
-        if not is_code_sent:  # Если код не отправлен
-            return Response({"detail": "Ошибка отправки SMS."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # Если код отправлен, возвращаем сообщение об успешной отправке
+        # Если все проверки прошли, возвращаем успешный ответ
         return Response({"detail": "Код отправлен на указанный номер телефона."}, status=status.HTTP_200_OK)
-    
+
+
+
 class BaseUserPostView(GenericAPIView):
     serializer_class = None
 

@@ -3,6 +3,7 @@ from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from djoser.conf import settings
+from core.redis import red
 from djoser.serializers import (
     UserCreatePasswordRetypeSerializer, PasswordRetypeSerializer,
     TokenSerializer, TokenCreateSerializer
@@ -90,22 +91,26 @@ class CustomTokenCreateSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         phone_number = attrs.get("phone_number")
-        self.user = User.objects.filter(phone_number=phone_number).first()
+        user = User.objects.filter(phone_number=phone_number).first()
 
-        if not self.user:
+        if not user:
             raise ValidationError(USER_NOT_EXISTS_ERROR)
 
-        if not self.user.check_otp_limit():
-            raise ValidationError(OTP_LIMIT_ERROR_MESSAGE)
+        # Проверяем лимит на отправку OTP через Redis
+        redis_key = f'sms_sent:user:{user.pk}'
+        if red.exists(redis_key):
+            raise ValidationError(_("SMS уже отправлено, повторите попытку позже."))
 
-        is_code_sent = send_nikita_sms(self.user)  # Отправляем SMS с кодом
+        # Отправляем SMS с кодом
+        is_code_sent = send_nikita_sms(user)
         if not is_code_sent:
             raise ValidationError(OTP_ERROR_MESSAGE)
 
-        return attrs
+        # Сохраняем в Redis метку о том, что SMS было отправлено
+        red.setex(redis_key, 300, 1)  # Время истечения — 5 минут
 
-    def to_representation(self, instance):
-        return {"message": _("Код верификации отправлен на указанный номер")}
+        attrs['user'] = user  # Передаем пользователя дальше
+        return attrs
 
 
 
