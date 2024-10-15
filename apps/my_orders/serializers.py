@@ -32,122 +32,67 @@ class CombinedOrderSerializer(serializers.Serializer):
     keep_shoe_box = serializers.SerializerMethodField()
     pickup_service = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
-    
+
     def get_order_type(self, obj):
         if isinstance(obj, Order):
-            print(f"Regular order: {obj.order_id}")
             return "regular_order"
         elif isinstance(obj, PurchaseOrder):
-            print(f"Purchase order: {obj.order_id}")
             return "purchase_order"
-        print(f"Unknown order type: {type(obj)}")
         return "unknown"
 
     def get_product_name(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.product_name
-        return None  # У обычного заказа нет поля product_name
-    
+        return getattr(obj, 'product_name', None)
+
     def get_product_url(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.product_url
-        return None 
-    
+        return getattr(obj, 'product_url', None)
+
     def get_price(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.price
-        return None
+        return getattr(obj, 'price', None)
 
     def get_sender_name(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.sender_name
-        return None
+        return getattr(obj, 'sender_name', None)
 
     def get_sender_phone(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.sender_phone
-        return None
+        return getattr(obj, 'sender_phone', None)
 
     def get_receiver_name(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.receiver_name
-        return None
+        return getattr(obj, 'receiver_name', None)
 
     def get_receiver_phone(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.receiver_phone
-        return None
+        return getattr(obj, 'receiver_phone', None)
 
     def get_article(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.article
-        return None
+        return getattr(obj, 'article', None)
 
     def get_color(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.color
-        return None
+        return getattr(obj, 'color', None)
 
     def get_quantity(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.quantity
-        return None
+        return getattr(obj, 'quantity', None)
 
     def get_estimated_arrival(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.estimated_arrival
-        return None
-    
+        return getattr(obj, 'estimated_arrival', None)
+
     def get_keep_shoe_box(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.keep_shoe_box
-        return None
+        return getattr(obj, 'keep_shoe_box', None)
 
     def get_pickup_service(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            return obj.pickup_service
-        return None
-    
-    def get_delivery_cost(self, obj):
-        if isinstance(obj, Order):
-            return obj.delivery_cost
-        return None
-    
-    def get_from_delivery_type(self, obj):
-        if isinstance(obj, Order):
-            return obj.from_delivery_type
-        return None
-    
-    def get_to_delivery_type(self, obj):
-        if isinstance(obj, Order):
-            return obj.to_delivery_type
-        return None
-    
-    def get_product_category(self, obj):
-        if isinstance(obj, Order):
-            return obj.product_category
-        return None
-    
-    def get_receiver_name(self, obj):
-        if isinstance(obj, Order):
-            return obj.receiver_name
-        return None
+        return getattr(obj, 'pickup_service', None)
 
-    def get_receiver_phone(self, obj):
-        if isinstance(obj, Order):
-            return obj.receiver_phone
-        return None
+    def get_delivery_cost(self, obj):
+        return getattr(obj, 'delivery_cost', None)
 
     # Метод для отображения пользователя
     def get_user(self, obj):
         if obj.user:
             return {
                 'id': obj.user.id,
-                'name': obj.user.name,  # Предположим, у пользователя есть поле 'name'
-                'phone_number': obj.user.phone_number  # Или другой идентификатор
+                'name': obj.user.name,
+                'phone_number': obj.user.phone_number
             }
         return None
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        # Убираем None поля из представления
         return {key: value for key, value in representation.items() if value is not None}
