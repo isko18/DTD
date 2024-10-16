@@ -1,6 +1,8 @@
 from pathlib import Path
 from datetime import timedelta
 from .env_reader import env
+from firebase_admin import initialize_app, credentials
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'django_json_widget',
 ]
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Настройки rest framework
 AUTH_USER_MODEL = 'users.User'
 
@@ -149,22 +152,28 @@ STATIC_ROOT = BASE_DIR / 'static'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# JWT настройки
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
+# # JWT настройки
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
+#     'ROTATE_REFRESH_TOKENS': False,
+#     'BLACKLIST_AFTER_ROTATION': True,
 
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': env('SECRET_KEY'),  # Забираем секретный ключ из окружения
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-}
+#     'ALGORITHM': 'HS256',
+#     'SIGNING_KEY': env('SECRET_KEY'),  # Забираем секретный ключ из окружения
+#     'AUTH_HEADER_TYPES': ('Bearer',),
+#     'USER_ID_FIELD': 'id',
+#     'USER_ID_CLAIM': 'user_id',
+#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+#     'TOKEN_TYPE_CLAIM': 'token_type',
+# }
 
+FIREBASE_APPLICATION_CREDENTIALS = os.environ.get(
+    'FIREBASE_APPLICATION_CREDENTIALS'
+)
+
+firebase_cred = credentials.Certificate(FIREBASE_APPLICATION_CREDENTIALS)
+firebase_app = initialize_app(firebase_cred)
 
 FCM_DJANGO_SETTINGS = {
     # an instance of firebase_admin.App to be used as default for all fcm-django requests
@@ -184,7 +193,7 @@ FCM_DJANGO_SETTINGS = {
 NIKITA_LOGIN = env('NIKITA_LOGIN', default='')
 NIKITA_PASSWORD = env('NIKITA_PASSWORD', default='')
 NIKITA_SENDER = env('NIKITA_SENDER', default='')
-NIKITA_TEST = env('NIKITA_TEST', default='0')
+NIKITA_TEST = env('NIKITA_TEST', default='1')
 NIKITA_URL = env('NIKITA_URL', default='')
 
 REDIS_HOST = env('REDIS_HOST', default='0.0.0.0')
