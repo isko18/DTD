@@ -168,12 +168,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 #     'TOKEN_TYPE_CLAIM': 'token_type',
 # }
 
-FIREBASE_APPLICATION_CREDENTIALS = os.environ.get(
-    'FIREBASE_APPLICATION_CREDENTIALS'
-)
+# FIREBASE_APPLICATION_CREDENTIALS = os.environ.get(
+#     'FIREBASE_APPLICATION_CREDENTIALS'
+# )
 
-firebase_cred = credentials.Certificate(FIREBASE_APPLICATION_CREDENTIALS)
-firebase_app = initialize_app(firebase_cred)
+# firebase_cred = credentials.Certificate(FIREBASE_APPLICATION_CREDENTIALS)
+# firebase_app = initialize_app(firebase_cred)
 
 FCM_DJANGO_SETTINGS = {
     # an instance of firebase_admin.App to be used as default for all fcm-django requests

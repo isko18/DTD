@@ -26,6 +26,11 @@ class SubCity(models.Model):
 
 class ProductCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Категория товара")
+    price_category = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        verbose_name="Цена"
+    )
 
     def __str__(self):
         return self.name
@@ -58,7 +63,7 @@ class Order(models.Model):
     receiver_name = models.CharField(max_length=100, verbose_name="Имя получателя")
     receiver_phone = models.CharField(max_length=20, verbose_name="Телефон получателя")
     product_category = models.ForeignKey(ProductCategory, related_name="orders", on_delete=models.SET_NULL, null=True, verbose_name="Категория товара")
-    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость доставки")
+    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость доставки", blank=True, null=True)
     comment = models.TextField(blank=True, null=True, verbose_name="Комментарий")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders_users", verbose_name="Пользователь")

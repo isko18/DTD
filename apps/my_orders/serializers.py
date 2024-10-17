@@ -1,10 +1,15 @@
 from rest_framework import serializers
-from apps.orders.models import Order
+from apps.orders.models import Order, ProductCategory
 from apps.ransom.models import PurchaseOrder, PurchaseOrderItem
 
+class ProductCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCategory
+        fields = ['name', 'price_category']  # Добавляем и name, и price
+
 class PurchaseOrderItemSerializer(serializers.ModelSerializer):
-    product_category = serializers.CharField(source="product_category.name", allow_null=True)
-    
+    product_category = ProductCategorySerializer()
+
     class Meta:
         model = PurchaseOrderItem
         fields = ['product_name', 'product_url', 'product_category', 'price', 'article', 'color', 'quantity', 'comment']
@@ -22,7 +27,7 @@ class CombinedOrderSerializer(serializers.Serializer):
     to_subcity = serializers.CharField(source='to_subcity.name', allow_null=True)
     to_address = serializers.CharField(allow_null=True)
     to_delivery_type = serializers.CharField(allow_null=True)
-    product_category = serializers.CharField(source='product_category.name', allow_null=True)  # Добавлено отображение категории товара
+    product_category = ProductCategorySerializer()  # Добавляем вложенный сериализатор
 
     # Поля для товаров
     items = PurchaseOrderItemSerializer(many=True, read_only=True)
@@ -46,22 +51,6 @@ class CombinedOrderSerializer(serializers.Serializer):
         elif isinstance(obj, PurchaseOrder):
             return "purchase_order"
         return "unknown"
-    
-    def get_product_category(self, obj):
-        if isinstance(obj, PurchaseOrder):
-            # Получаем категорию из PurchaseOrderItem
-            items = obj.items.all()
-            if items.exists():
-                return items.first().product_category.name
-        elif isinstance(obj, Order):
-            # Если это обычный заказ (Order), добавьте нужную логику
-            # Например, если Order связан с продуктами через поле "items"
-            if hasattr(obj, 'items') and obj.items.exists():
-                # Предположим, что у items есть связь с категорией продукта
-                first_item = obj.items.first()
-                if hasattr(first_item, 'product') and first_item.product and hasattr(first_item.product, 'category'):
-                    return first_item.product.category.name
-        return None
 
     # Методы для полей отправителя и получателя (только для PurchaseOrder)
     def get_sender_name(self, obj):

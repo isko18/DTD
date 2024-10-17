@@ -104,14 +104,7 @@ class PurchaseOrder(models.Model):
         auto_now_add=True, 
         verbose_name="Дата создания"
     )
-    pickup_service = models.BooleanField(
-        default=False, 
-        verbose_name="Услуга вылова товара"
-    )
-    keep_shoe_box = models.BooleanField(
-        default=False, 
-        verbose_name="Сохранить коробку из под обуви"
-    )
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
@@ -175,6 +168,14 @@ class PurchaseOrderItem(models.Model):
         blank=True, 
         null=True, 
         verbose_name="Комментарий"
+    )
+    pickup_service = models.BooleanField(
+        default=False, 
+        verbose_name="Услуга вылова товара"
+    )
+    keep_shoe_box = models.BooleanField(
+        default=False, 
+        verbose_name="Сохранить коробку из под обуви"
     )
 
     def __str__(self):
