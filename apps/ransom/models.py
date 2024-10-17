@@ -99,6 +99,7 @@ class PurchaseOrder(models.Model):
         max_length=20, 
         verbose_name="Телефон получателя"
     )
+    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость доставки", blank=True, null=True)
     # Убираем поля товара из PurchaseOrder, так как товары теперь будут храниться в PurchaseOrderItem
     created_at = models.DateTimeField(
         auto_now_add=True, 

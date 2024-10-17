@@ -5,14 +5,20 @@ from apps.ransom.models import PurchaseOrder, PurchaseOrderItem
 class ProductCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCategory
-        fields = ['id', 'name', 'price_category']  # Добавляем id, name и price_category
+        fields = ['id', 'name', 'price_category']
 
 class PurchaseOrderItemSerializer(serializers.ModelSerializer):
-    product_category = serializers.CharField(source='product_category.name')  # Отображаем только имя категории
+    product_category = serializers.SerializerMethodField()
 
     class Meta:
         model = PurchaseOrderItem
         fields = ['product_name', 'product_url', 'product_category', 'price', 'article', 'color', 'quantity', 'keep_shoe_box', 'pickup_service', 'comment']
+
+    def get_product_category(self, obj):
+        # Проверяем, есть ли product_category, прежде чем получить имя
+        if obj.product_category:
+            return obj.product_category.name
+        return None
 
 class CombinedOrderSerializer(serializers.Serializer):
     order_type = serializers.SerializerMethodField()
@@ -26,7 +32,7 @@ class CombinedOrderSerializer(serializers.Serializer):
     to_subcity = serializers.CharField(source='to_subcity.name', allow_null=True)
     to_address = serializers.CharField(allow_null=True)
     to_delivery_type = serializers.CharField(allow_null=True)
-    product_category = serializers.SerializerMethodField()  # Используем метод для гибкости
+    product_category = serializers.SerializerMethodField()
 
     # Поля для товаров
     items = PurchaseOrderItemSerializer(many=True, read_only=True)
@@ -37,7 +43,9 @@ class CombinedOrderSerializer(serializers.Serializer):
     receiver_name = serializers.SerializerMethodField()
     receiver_phone = serializers.SerializerMethodField()
 
-    delivery_cost = serializers.CharField(allow_null=True)
+    # Поле для стоимости доставки
+    delivery_cost = serializers.SerializerMethodField()
+
     comment = serializers.CharField(allow_null=True)
     created_at = serializers.DateTimeField()
     user = serializers.SerializerMethodField()
@@ -54,7 +62,9 @@ class CombinedOrderSerializer(serializers.Serializer):
         if isinstance(obj, PurchaseOrder):
             items = obj.items.all()
             if items.exists():
-                return items.first().product_category.name  # Только имя категории
+                product_category = items.first().product_category
+                if product_category:
+                    return product_category.name  # Возвращаем имя категории
         # Логика для типа Order: категория с именем и ценой
         elif isinstance(obj, Order):
             if obj.product_category:
@@ -63,6 +73,14 @@ class CombinedOrderSerializer(serializers.Serializer):
                     'name': obj.product_category.name,
                     'price_category': obj.product_category.price_category
                 }
+        return None
+
+    def get_delivery_cost(self, obj):
+        # Логика для возврата стоимости доставки
+        if isinstance(obj, PurchaseOrder):
+            return getattr(obj, 'delivery_cost', None)
+        elif isinstance(obj, Order):
+            return getattr(obj, 'delivery_cost', None)
         return None
 
     def get_sender_name(self, obj):
