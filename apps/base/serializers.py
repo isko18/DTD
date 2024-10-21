@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from apps.base.models import (
-     Banner, FAQ, AboutApp, Support, Ad, VersionControl
+     Banner, FAQ, AboutApp, Support, Ad, VersionControl, PrivacyPolicy, OfferAgreement
 )
 
 
@@ -79,3 +79,14 @@ class IOSVersionControlSerializer(serializers.ModelSerializer):
     class Meta:
         model = VersionControl
         fields = ('ios_version', 'ios_force_update')
+
+
+class PrivacyPolicySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PrivacyPolicy
+        fields = ('descriptions')
+        
+class OfferAgreementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OfferAgreement
+        fields = ('descriptions')

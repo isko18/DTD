@@ -6,7 +6,7 @@ from solo.models import SingletonModel
 
 from core.redis import red
 from apps.utils import custom_upload_path
-
+from ckeditor.fields import RichTextField
 
 # Create your models here.
 
@@ -131,3 +131,30 @@ class Support(SingletonModel):
     class Meta:
         verbose_name = _('Поддержка')
         verbose_name_plural = _('Поддержка')
+
+
+
+class PrivacyPolicy(models.Model):
+    descriptions = RichTextField(
+        verbose_name='ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ'
+    ) 
+    
+    def __str__(self) -> str:
+        return self.descriptions
+    
+    class Meta:
+        verbose_name = _("ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ")
+        verbose_name_plural = _("ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ")
+        
+        
+class OfferAgreement(models.Model):
+    descriptions = RichTextField(
+        verbose_name='ДОГОВОР ОФЕРТЫ'
+    ) 
+    
+    def __str__(self) -> str:
+        return self.descriptions
+    
+    class Meta:
+        verbose_name = _("ДОГОВОР ОФЕРТЫ")
+        verbose_name_plural = _("ДОГОВОР ОФЕРТЫ")

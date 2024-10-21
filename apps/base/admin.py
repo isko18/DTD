@@ -3,7 +3,7 @@ from django.contrib import admin
 from solo.admin import SingletonModelAdmin
 
 from apps.base.models import (
-    Banner, AboutApp, FAQ, Support, Ad, VersionControl)
+    Banner, AboutApp, FAQ, Support, Ad, VersionControl, OfferAgreement, PrivacyPolicy)
 
 @admin.register(Banner)
 class BannerAdmin(admin.ModelAdmin):
@@ -36,3 +36,13 @@ class VersionControlAdmin(SingletonModelAdmin):
         ('Android', {'fields': ('android_version', 'android_force_update')}),
         ('IOS', {'fields': ('ios_version', 'ios_force_update')}),
     )
+
+
+@admin.register(PrivacyPolicy)
+class SupportAdmin(SingletonModelAdmin):
+    pass
+
+
+@admin.register(OfferAgreement)
+class SupportAdmin(SingletonModelAdmin):
+    pass

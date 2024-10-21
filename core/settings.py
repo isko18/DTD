@@ -2,6 +2,8 @@ from pathlib import Path
 from datetime import timedelta
 from .env_reader import env
 from firebase_admin import initialize_app, credentials
+from core.ckeditor import *
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +35,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework.authtoken',
     'django_filters',
+    'ckeditor',
+    'ckeditor_uploader',
 
     # apps
     'apps.users',
@@ -48,6 +52,8 @@ INSTALLED_APPS = [
     # json
     'django_json_widget',
 ]
+
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Настройки rest framework

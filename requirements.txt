@@ -20,14 +20,18 @@ cryptography==43.0.1
 defusedxml==0.8.0rc2
 dicttoxml==1.7.16
 Django==5.0
+django-admin-sortable2==2.2.3
 django-appconf==1.0.6
+django-ckeditor==6.7.1
 django-cors-headers==4.3.1
 django-cuser==2017.3.16
 django-fcm==0.1.1
 django-filter==23.5
 django-imagekit==5.0.0
 django-jazzmin==3.0.0
+django-js-asset==2.2.0
 django-json-widget==1.1.1
+django-solo==2.3.0
 django-templated-mail==1.1.1
 django-tinymce==4.1.0
 djangorestframework==3.14.0
@@ -38,6 +42,7 @@ exceptiongroup==1.2.0
 fcm-django==2.2.1
 firebase-admin==6.5.0
 future==0.18.3
+git-filter-repo==2.45.0
 google-api-core==2.19.2
 google-api-python-client==2.146.0
 google-auth==2.34.0

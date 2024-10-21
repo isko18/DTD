@@ -6,7 +6,8 @@ from apps.base.models import (
 )
 from apps.base.serializers import (
     BannerListSerializer, BannerDetailSerializer, AboutAppSerializer,
-    SupportSerializer, AdPageSerializer, AndroidVersionControlSerializer, IOSVersionControlSerializer
+    SupportSerializer, AdPageSerializer, AndroidVersionControlSerializer, IOSVersionControlSerializer,
+    PrivacyPolicySerializer, OfferAgreementSerializer
 )
 
 
@@ -60,6 +61,21 @@ class AndroidVersionControlAPIView(RetrieveAPIView):
 
 class IOSVersionControlAPIView(RetrieveAPIView):
     serializer_class = IOSVersionControlSerializer
+    permission_classes = (AllowAny,)
+
+    def get_object(self):
+        return VersionControl.objects.first()
+
+
+class PrivacyPolicyAPIView(RetrieveAPIView):
+    serializer_class = PrivacyPolicySerializer
+    permission_classes = (AllowAny,)
+
+    def get_object(self):
+        return VersionControl.objects.first()
+    
+class OfferAgreementAPIView(RetrieveAPIView):
+    serializer_class = OfferAgreementSerializer
     permission_classes = (AllowAny,)
 
     def get_object(self):
