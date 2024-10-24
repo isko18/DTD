@@ -2,12 +2,13 @@ import string
 import random
 from django.db import models
 from apps.orders.models import City, SubCity, ProductCategory
-from django.conf import settings 
+from django.conf import settings
+from apps.notification.models import Notification  # Импорт модели Notification
+from apps.notification.send_notification import send_push_notification  # Импорт функции для отправки push-уведомлений
 
 def generate_unique_order_id():
     """Генерация уникального идентификатора для заказа."""
     return 'JOG' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
-
 
 
 class PurchaseOrder(models.Model):
@@ -99,8 +100,13 @@ class PurchaseOrder(models.Model):
         max_length=20, 
         verbose_name="Телефон получателя"
     )
-    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость доставки", blank=True, null=True)
-    # Убираем поля товара из PurchaseOrder, так как товары теперь будут храниться в PurchaseOrderItem
+    delivery_cost = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        verbose_name="Стоимость доставки", 
+        blank=True, 
+        null=True
+    )
     created_at = models.DateTimeField(
         auto_now_add=True, 
         verbose_name="Дата создания"
@@ -122,9 +128,56 @@ class PurchaseOrder(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
+        is_new = not self.pk  # Проверяем, новый ли это заказ
         if not self.order_id:
             self.order_id = generate_unique_order_id()
+
+        # Получаем предыдущий статус заказа
+        previous_status = None
+        if self.pk:
+            previous_status = PurchaseOrder.objects.get(pk=self.pk).status
+
         super(PurchaseOrder, self).save(*args, **kwargs)
+
+        # Логика для отправки уведомления при создании заказа
+        if is_new:
+            self.send_creation_notification()
+
+        # Логика для отправки уведомления при изменении статуса
+        if not is_new and previous_status != self.status:
+            self.send_status_change_notification()
+
+    def send_creation_notification(self):
+        """
+        Отправка уведомления при создании заказа.
+        """
+        message = f"Ваш выкуп {self.order_id} был успешно создан."
+        notification = Notification(
+            title="Создание заказа",
+            message=message,
+        )
+        notification.save()  # Сохраняем уведомление
+
+        notification.users.set([self.user])  # Добавляем пользователя
+        notification.save()  # Сохраняем уведомление с пользователями
+
+        send_push_notification(notification)  # Отправляем пуш-уведомление
+
+    def send_status_change_notification(self):
+        """
+        Отправка уведомления при изменении статуса заказа.
+        """
+        message = f"Статус вашего выкупа {self.order_id} изменен на {self.get_status_display()}."
+        notification = Notification(
+            title="Изменение статуса выкупа",
+            message=message,
+        )
+        notification.save()  # Сохраняем уведомление
+
+        notification.users.set([self.user])  # Добавляем пользователя
+        notification.save()  # Сохраняем уведомление с пользователями
+
+        send_push_notification(notification)  # Отправляем пуш-уведомление
 
 
 class PurchaseOrderItem(models.Model):

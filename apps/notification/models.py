@@ -49,3 +49,4 @@ class Notification(models.Model):
         if self.for_topic:
             topic = self.NEWS_TOPIC
         send_push_notification(notification=self, topic=topic)
+

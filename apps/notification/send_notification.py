@@ -14,6 +14,7 @@ def send_push_notification(notification):
 
         # Если нет пользователей с FCM токенами, выходим
         if not fcm_tokens:
+            print("Нет пользователей с действующими FCM токенами.")
             return False
 
         # Определяем конфигурацию для Android и iOS
@@ -36,28 +37,6 @@ def send_push_notification(notification):
 
         return True
 
-    except Exception as e:
-        print(f"Ошибка при отправке уведомления: {e}")
-        return False
-
-
-def send_message_notification(title, body, fcm_token):
-    try:
-        sound = 'default'
-        android_config = AndroidConfig(notification=AndroidNotification(sound=sound))
-        ios_config = APNSConfig(payload=APNSPayload(aps=Aps(sound=sound)))
-
-        message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body,
-            ),
-            android=android_config,  # Конфигурация для Android
-            apns=ios_config,  # Конфигурация для iOS
-            token=fcm_token,
-        )
-        messaging.send(message)
-        return True
     except Exception as e:
         print(f"Ошибка при отправке уведомления: {e}")
         return False

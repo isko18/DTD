@@ -2,6 +2,9 @@ import random
 import string
 from django.db import models
 from django.conf import settings 
+from apps.notification.send_notification import send_push_notification 
+from apps.notification.models import Notification  # Импортируем модель Notification
+
 
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name="Город")
@@ -72,16 +75,63 @@ class Order(models.Model):
         return f"Заказ {self.order_id} из {self.from_city.name} в {self.to_city.name}"
 
     def save(self, *args, **kwargs):
+        is_new = not self.pk  # Проверяем, новый ли это заказ
         if not self.order_id:
             self.order_id = self.generate_unique_order_id()
+
+        # Получаем предыдущий статус заказа
+        previous_status = None
+        if self.pk:
+            previous_status = Order.objects.get(pk=self.pk).status
+
         super(Order, self).save(*args, **kwargs)
+
+        # Логика для отправки уведомления при создании заказа
+        if is_new:
+            self.send_creation_notification()
+
+        # Логика для отправки уведомления при изменении статуса
+        if not is_new and previous_status != self.status:
+            self.send_status_change_notification()
 
     def generate_unique_order_id(self):
         while True:
             order_id = 'JOG' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
             if not Order.objects.filter(order_id=order_id).exists():
                 return order_id
-            
+
+    def send_creation_notification(self):
+        """
+        Отправка уведомления при создании заказа.
+        """
+        message = f"Ваш заказ {self.order_id} был успешно создан."
+        notification = Notification(
+            title="Создание заказа",
+            message=message,
+        )
+        notification.save()  # Сначала сохраняем уведомление
+
+        notification.users.set([self.user])  # Теперь присваиваем пользователей
+        notification.save()  # Сохраняем снова для обновления M2M поля
+
+        send_push_notification(notification)  # Передаём объект уведомления
+
+    def send_status_change_notification(self):
+        """
+        Отправка уведомления при изменении статуса заказа.
+        """
+        message = f"Статус вашего заказа {self.order_id} изменен на {self.get_status_display()}."
+        notification = Notification(
+            title="Изменение статуса заказа",
+            message=message,
+        )
+        notification.save()  # Сначала сохраняем уведомление
+
+        notification.users.set([self.user])  # Теперь присваиваем пользователей
+        notification.save()  # Сохраняем снова для обновления M2M поля
+
+        send_push_notification(notification)  # Передаём объект уведомления
+
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
