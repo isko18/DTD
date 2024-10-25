@@ -153,7 +153,7 @@ class PurchaseOrder(models.Model):
         """
         message = f"Ваш выкуп {self.order_id} был успешно создан."
         notification = Notification(
-            title="Создание заказа",
+            title="Создан выкуп",
             message=message,
         )
         notification.save()  # Сохраняем уведомление

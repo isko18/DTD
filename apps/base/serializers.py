@@ -84,9 +84,9 @@ class IOSVersionControlSerializer(serializers.ModelSerializer):
 class PrivacyPolicySerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivacyPolicy
-        fields = ('descriptions')
+        fields = "__all__"
         
 class OfferAgreementSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferAgreement
-        fields = ('descriptions')
+        fields = "__all__"

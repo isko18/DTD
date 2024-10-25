@@ -106,7 +106,7 @@ class Order(models.Model):
         """
         message = f"Ваш заказ {self.order_id} был успешно создан."
         notification = Notification(
-            title="Создание заказа",
+            title="Создан заказ",
             message=message,
         )
         notification.save()  # Сначала сохраняем уведомление
