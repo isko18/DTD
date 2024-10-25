@@ -2,7 +2,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 
 from apps.base.models import (
-    Banner, AboutApp, Support, VersionControl
+    Banner, AboutApp, Support, VersionControl, OfferAgreement, PrivacyPolicy
 )
 from apps.base.serializers import (
     BannerListSerializer, BannerDetailSerializer, AboutAppSerializer,
@@ -72,11 +72,11 @@ class PrivacyPolicyAPIView(RetrieveAPIView):
     permission_classes = (AllowAny,)
 
     def get_object(self):
-        return VersionControl.objects.first()
+        return PrivacyPolicy.objects.first()
     
 class OfferAgreementAPIView(RetrieveAPIView):
     serializer_class = OfferAgreementSerializer
     permission_classes = (AllowAny,)
 
     def get_object(self):
-        return VersionControl.objects.first()
+        return OfferAgreement.objects.first()
