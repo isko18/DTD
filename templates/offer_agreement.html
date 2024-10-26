@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Договор оферты</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .content {
+            max-width: 800px; /* Ограничивает ширину контента */
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        {{ offer.descriptions|safe }}
+    </div>
+</body>
+</html>

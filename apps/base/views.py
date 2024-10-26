@@ -1,5 +1,6 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
+from django.shortcuts import render
 
 from apps.base.models import (
     Banner, AboutApp, Support, VersionControl, OfferAgreement, PrivacyPolicy
@@ -71,12 +72,22 @@ class PrivacyPolicyAPIView(RetrieveAPIView):
     serializer_class = PrivacyPolicySerializer
     permission_classes = (AllowAny,)
 
+    def get(self, request, *args, **kwargs):
+        policy = self.get_object()
+        context = {"policy": policy}
+        return render(request, 'privacy_policy.html', context)
+
     def get_object(self):
         return PrivacyPolicy.objects.first()
     
 class OfferAgreementAPIView(RetrieveAPIView):
     serializer_class = OfferAgreementSerializer
     permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        offer = self.get_object()
+        context = {"offer": offer}
+        return render(request, 'offer_agreement.html', context)
 
     def get_object(self):
         return OfferAgreement.objects.first()
