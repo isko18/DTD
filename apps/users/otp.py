@@ -18,14 +18,15 @@ def send_nikita_sms(user, phone_number=None):
     
     # Проверка, если номер телефона является тестовым
     if phone_number == "+996111111":
-        # Устанавливаем тестовый код 123456
-        user.verification_code = "123456"
+        # Устанавливаем тестовый код 1234
+        user.verification_code = "1234"
+        user.save()  # Сохраняем изменения в базе данных
         test_mode = True
     else:
         # Генерация и сохранение кода подтверждения, если не тестовый режим
         user.generate_and_save_verification_code()
         test_mode = (settings.NIKITA_TEST) == 1
-    
+        
     # Формируем сообщение
     message = f"Ваш код верификации: {user.verification_code}"
     data = {

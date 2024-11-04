@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy
 from djoser.conf import settings
 from core.redis import red
 from djoser.serializers import (
@@ -96,6 +97,14 @@ class CustomTokenCreateSerializer(serializers.Serializer):
         if not user:
             raise ValidationError(USER_NOT_EXISTS_ERROR)
 
+        # Проверка на тестовый номер телефона
+        if phone_number == "+996111111":
+            # Устанавливаем тестовый код 1234
+            user.verification_code = "1234"
+            user.save(update_fields=["verification_code"])
+            attrs['user'] = user  # Передаем пользователя дальше
+            return attrs
+
         # Проверяем лимит на отправку OTP через Redis
         redis_key = f'sms_sent:user:{user.pk}'
         if red.exists(redis_key):
@@ -111,8 +120,6 @@ class CustomTokenCreateSerializer(serializers.Serializer):
 
         attrs['user'] = user  # Передаем пользователя дальше
         return attrs
-
-
 
 class UserSignInSerializer(TokenSerializer):
 
@@ -164,7 +171,7 @@ class UserVerificationCodeCheckSerializer(PhoneNumberValidateMixin, BaseVerifica
 
     def to_representation(self, instance):
         token, _ = Token.objects.get_or_create(user=instance)
-        return {"auth_token": token.key, "message": _("Номер успешно подтвержден")}
+        return {"auth_token": token.key, "message": gettext_lazy("Номер успешно подтвержден")}
 
 class UserPasswordResetSerializer(PhoneNumberValidateMixin, PasswordRetypeSerializer):
     phone_number = serializers.CharField(required=True, max_length=30)
